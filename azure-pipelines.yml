@@ -107,7 +107,7 @@ steps:
 #       docker exec -i jmeter-test /bin/bash -c 'cd /home/jmeter | ls -lrt'
 
 #       echo "##Executing Loadtest##"
-#       docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmeter-test /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -l /home/jmeter/jmeter$(Build.BuildId).jtl'
+#       docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmasater /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -l /home/jmeter/jmeter$(Build.BuildId).jtl'
       
 #       #echo "##Docker container logs##"
 #       #docker logs jmmasater
@@ -127,6 +127,7 @@ steps:
 #       echo "##Kill and Remove Docker Container##"
 #       docker stop jmmasater jmslave
 #       docker rm -f jmmasater jmslave
+#     workingDirectory: '$(System.DefaultWorkingDirectory)'
 
 # - task: PublishReleaseArtifact@1
 #   displayName: 'Collate Results'

@@ -7,9 +7,9 @@ MAINTAINER Rajasekar S <rajasekars792@gmail.com>
 #ENV JMETER_VERSION 5.4.3
 #ENV JMETER_HOME /jmeter/apache-jmeter-$JMETER_VERSION/
 
-RUN useradd --create-home -s /bin/bash jmeter
+RUN useradd --create-home -s /bin/bash jmslave
 WORKDIR /home/jmeter
-USER jmeter
+USER jmslave
 
 ENV JMETER_VERSION 5.3
 ENV JMETER_HOME /home/jmeter/apache-jmeter-${JMETER_VERSION}
