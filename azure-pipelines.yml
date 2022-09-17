@@ -10,10 +10,106 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+# - script: echo 'Welcome To JmeterAzurePipeline!'
+#   displayName: 'JMeterLoadTestUsingAzPipeline'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: DockerInstaller@0
+  inputs:
+    dockerVersion: '17.09.0-ce'
+
+# - task: Bash@3
+#   displayName: 'DockerHub Login'
+#   inputs:
+#     targetType: 'inline'
+#     script: |
+#       echo '##Login to Docker Hub'
+#       docker login -u rajasekars792 -p Shiva2889$
+#       docker --version
+#     workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+- task: Bash@3
+  displayName: 'ACR Login'
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo '##Login to ACR##'
+      docker login jmeteracrrepo.azurecr.io -u jmeteracrrepo -p jrW6sM=SUnX9kYNW8pdzdQFct7bkJW3j
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+# - task: Bash@3
+#   displayName: 'Build and Push docker image'
+#   inputs:
+#     targetType: 'inline'
+#     script: |
+#       echo 'Build and Push docker image'
+#       ls -lrt $(System.DefaultWorkingDirectory)/Scripts
+#       echo 'Build docker image from docker file'
+#       docker build -f $(System.DefaultWorkingDirectory)/Scripts/Dockerfile -t rajasekars792/jmeter:jmeter5.3Azv1 .
+#       echo 'push to docker image to dockerhub repo'
+#       docker push rajasekars792/jmeter:jmeter5.3Azv1
+
+- task: Bash@3
+  displayName: 'Build and Push docker image to ACR'
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo '##Build and Push docker image to ACR##'
+      ls -lrt $(System.DefaultWorkingDirectory)/Scripts
+      echo '##Build docker image from docker file##'
+      docker build -f $(System.DefaultWorkingDirectory)/Scripts/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azv1 .
+      echo '##push to docker image to ACR repo##'
+      docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azv1
+
+- task: Bash@3
+  displayName: 'Execute Performance Test'
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo "##Checking for Docker container status"
+      status=$(docker ps | grep "jmeter-test" | wc -l)
+      echo "$status"
+      if [ $status == 1 ]
+      then
+      docker stop jmeter-test
+      docker rm -f jmeter-test
+      fi
+
+      echo "##Creating a Container using the latest Docker Image with indefinte sleep time##"
+      # docker run -d --name jmeter-test -p 9270:9270 rajasekars792/jmeter:jmeter5.3v1 sleep infinity
+      docker run -d --name jmeter-test -p 9270:9270 jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azv1 sleep infinity
+
+      echo "##Listing Containers##"
+      docker ps
+
+      echo "##Copying test scripts and csv files to JMeter bin location##"
+      docker cp $(System.DefaultWorkingDirectory)/Scripts/Pipeline_SampleScript.jmx jmeter-test:/home/jmeter/
+
+      echo "##Listing files in container##"
+      docker exec -i jmeter-test /bin/bash -c 'cd /home/jmeter | ls -lrt'
+
+      echo "##Executing Loadtest##"
+      docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmeter-test /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -l /home/jmeter/jmeter$(Build.BuildId).jtl'
+      
+      #echo "##Docker container logs##"
+      #docker logs jmeter-test
+
+      echo "##Viewing jmeter.log##"
+      docker exec -i jmeter-test /bin/bash -c 'cat jmeter.log'
+                
+      echo "##Creating HTML Report##"
+      docker exec -i jmeter-test /bin/bash -c 'jmeter -g /home/jmeter/jmeter$(Build.BuildId).jtl -e -o /home/jmeter/htmlreport$(Build.BuildId)/'
+
+      echo "##Copying JTL and HTML Report to Azure Working DIR##"
+      docker cp jmeter-test:/home/jmeter/jmeter$(Build.BuildId).jtl $(System.DefaultWorkingDirectory)/Scripts/jmeter$(Build.BuildId).jtl
+      docker cp jmeter-test:/home/jmeter/htmlreport$(Build.BuildId)/ $(System.DefaultWorkingDirectory)/Scripts/htmlreport$(Build.BuildId)/
+      
+      ##> /dev/null && cat /home/jmeter/jmeter$(Build.BuildId).jtl' > $(System.DefaultWorkingDirectory)/Scripts/jmeter$(Build.BuildId).jtl
+
+      echo "##Kill and Remove Docker Container##"
+      docker stop jmeter-test
+      docker rm -f jmeter-test
+
+- task: PublishReleaseArtifact@1
+  displayName: 'Collate Results'
+  inputs:
+    artifactPath: '$(System.DefaultWorkingDirectory)'
