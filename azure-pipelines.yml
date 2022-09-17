@@ -93,7 +93,7 @@ steps:
 
       echo "##Creating a Container using the latest Docker Image with indefinte sleep time##"
       # docker run -d --name jmeter-test -p 9270:9270 rajasekars792/jmeter:jmeter5.3v1 sleep infinity
-      docker run -d --name jmmasater jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 sleep infinity
+      docker run -d --name jmmaster jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 sleep infinity
       docker run -d --name jmslave jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1 sleep infinity
 
       echo "##Listing Containers##"
