@@ -107,40 +107,40 @@ steps:
       echo "slave1 ip: $slave1_ip"
 
       echo "##Copying test scripts and csv files to JMeter bin location##"
-      docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmmaster:/home/jmeter/
-      docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmslave:/home/jmeter/
+      docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmmaster:/home/jmeter/bin/
+      docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmslave:/home/jmeter/bin/
 
       echo "##Listing files in master container##"
-      docker exec -i jmmaster /bin/bash -c 'cd /home/jmeter | ls -lrt'
+      docker exec -i jmmaster /bin/bash -c 'cd /home/jmeter/bin/ | ls -lrt'
 
       echo "##Listing files in slave container##"
-      docker exec -i jmslave /bin/bash -c 'cd /home/jmeter | ls -lrt'
+      docker exec -i jmslave /bin/bash -c 'cd /home/jmeter/bin/ | ls -lrt'
 
       echo "##Executing Loadtest##"
       #docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter$(Build.BuildId).jtl'
-      docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter1.jtl'
+      #docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter1.jtl'
       
       # #echo "##Docker container logs##"
       # #docker logs jmmaster
 
-      echo "##Viewing jmeter.log##"
-      docker exec -i jmmaster /bin/bash -c 'cat jmeter.log'
+      # echo "##Viewing jmeter.log##"
+      # docker exec -i jmmaster /bin/bash -c 'cat jmeter.log'
                 
-      echo "##Creating HTML Report##"
-      docker exec -i jmmaster /bin/bash -c 'jmeter -g /home/jmeter/jmeter1.jtl -e -o /home/jmeter/htmlreport1/'
+      # echo "##Creating HTML Report##"
+      # docker exec -i jmmaster /bin/bash -c 'jmeter -g /home/jmeter/jmeter1.jtl -e -o /home/jmeter/htmlreport1/'
 
-      echo "##Copying JTL and HTML Report to Azure Working DIR##"
-      docker cp jmmaster:/home/jmeter/jmeter1.jtl $(System.DefaultWorkingDirectory)/test/jmeter$(Build.BuildId).jtl
-      docker cp jmmaster:/home/jmeter/htmlreport1/ $(System.DefaultWorkingDirectory)/test/htmlreport$(Build.BuildId)/
+      # echo "##Copying JTL and HTML Report to Azure Working DIR##"
+      # docker cp jmmaster:/home/jmeter/jmeter1.jtl $(System.DefaultWorkingDirectory)/test/jmeter$(Build.BuildId).jtl
+      # docker cp jmmaster:/home/jmeter/htmlreport1/ $(System.DefaultWorkingDirectory)/test/htmlreport$(Build.BuildId)/
       
       # ##> /dev/null && cat /home/jmeter/jmeter$(Build.BuildId).jtl' > $(System.DefaultWorkingDirectory)/test/jmeter$(Build.BuildId).jtl
 
-      echo "##Kill and Remove Docker Container##"
-      docker stop jmmaster jmslave
-      docker rm -f jmmaster jmslave
+      # echo "##Kill and Remove Docker Container##"
+      # docker stop jmmaster jmslave
+      # docker rm -f jmmaster jmslave
     workingDirectory: '$(System.DefaultWorkingDirectory)'
 
-- task: PublishReleaseArtifact@1
-  displayName: 'Collate Results'
-  inputs:
-    artifactPath: '$(System.DefaultWorkingDirectory)'
+# - task: PublishReleaseArtifact@1
+#   displayName: 'Collate Results'
+#   inputs:
+#     artifactPath: '$(System.DefaultWorkingDirectory)'
