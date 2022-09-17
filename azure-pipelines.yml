@@ -114,7 +114,8 @@ steps:
       # docker exec -i jmeter-test /bin/bash -c 'cd /home/jmeter | ls -lrt'
 
       echo "##Executing Loadtest##"
-      docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter$(Build.BuildId).jtl'
+      #docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter$(Build.BuildId).jtl'
+      docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter1.jtl'
       
       # #echo "##Docker container logs##"
       # #docker logs jmmaster
@@ -123,11 +124,11 @@ steps:
       docker exec -i jmmaster /bin/bash -c 'cat jmeter.log'
                 
       echo "##Creating HTML Report##"
-      docker exec -i jmmaster /bin/bash -c 'jmeter -g /home/jmeter/jmeter$(Build.BuildId).jtl -e -o /home/jmeter/htmlreport$(Build.BuildId)/'
+      docker exec -i jmmaster /bin/bash -c 'jmeter -g /home/jmeter/jmeter1.jtl -e -o /home/jmeter/htmlreport1/'
 
       echo "##Copying JTL and HTML Report to Azure Working DIR##"
-      docker cp jmmaster:/home/jmeter/jmeter$(Build.BuildId).jtl $(System.DefaultWorkingDirectory)/test/jmeter$(Build.BuildId).jtl
-      docker cp jmmaster:/home/jmeter/htmlreport$(Build.BuildId)/ $(System.DefaultWorkingDirectory)/test/htmlreport$(Build.BuildId)/
+      docker cp jmmaster:/home/jmeter/jmeter1.jtl $(System.DefaultWorkingDirectory)/test/jmeter$(Build.BuildId).jtl
+      docker cp jmmaster:/home/jmeter/htmlreport1/ $(System.DefaultWorkingDirectory)/test/htmlreport$(Build.BuildId)/
       
       # ##> /dev/null && cat /home/jmeter/jmeter$(Build.BuildId).jtl' > $(System.DefaultWorkingDirectory)/test/jmeter$(Build.BuildId).jtl
 
