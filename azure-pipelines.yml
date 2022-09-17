@@ -101,10 +101,10 @@ steps:
 
       echo "##Extracting jmmaster jmslave container IP address##"
       master_pod_ip=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmmaster)
-      echo "$master_pod_ip"
+      echo "masterpod ip: $master_pod_ip"
 
       slave_pod1_ip=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmslave)
-      echo "$slave_pod1_ip"
+      echo "slavepod1 ip: $slave_pod1_ip"
 
       echo "##Copying test scripts and csv files to JMeter bin location##"
       docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmmaster:/home/jmeter/
