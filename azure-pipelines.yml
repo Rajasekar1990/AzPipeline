@@ -93,18 +93,18 @@ steps:
 
       echo "##Creating a Container using the latest Docker Image with indefinte sleep time##"
       # docker run -d --name jmeter-test -p 9270:9270 rajasekars792/jmeter:jmeter5.3v1 sleep infinity
-      docker run -d --name jmmasater -p 9270:9270 jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 sleep infinity
-      docker run -d --name jmslave -p 9270:9270 jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1 sleep infinity
+      docker run -d --name jmmasater jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 sleep infinity
+      docker run -d --name jmslave jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1 sleep infinity
+
+      echo "##Listing Containers##"
+      docker ps -a
 
       echo "##Extracting jmmaster jmslave container IP address##"
-      master_pod = docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmmaster
+      master_pod=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmmaster)
       echo "$master_pod"
 
-      slave_pods_1 = docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmslave
+      slave_pods_1=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmslave)
       echo "$slave_pods_1"
-
-      # echo "##Listing Containers##"
-      # docker ps
 
       # echo "##Copying test scripts and csv files to JMeter bin location##"
       # docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmmasater:/home/jmeter/
