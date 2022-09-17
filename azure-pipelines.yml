@@ -111,14 +111,14 @@ steps:
       docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmslave:/home/jmeter/
 
       echo "##Listing files in master container##"
-      docker exec -i jmmaster /bin/bash -c 'cd /home/jmeter/ && ls -lart'
+      docker exec -i jmmaster /bin/bash -c 'cd ${JMETER_BIN} && ls -lart'
 
       echo "##Listing files in slave container##"
-      docker exec -i jmslave /bin/bash -c 'cd /home/jmeter/ && ls -lart'
+      docker exec -i jmslave /bin/bash -c 'cd ${JMETER_BIN} && ls -lart'
 
       echo "##Executing Loadtest##"
       #docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter$(Build.BuildId).jtl'
-      docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -l /home/jmeter/jmeter$(Build.BuildId).jtl'
+      #docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l jmeter$(Build.BuildId).jtl'
       
       # #echo "##Docker container logs##"
       # #docker logs jmmaster
