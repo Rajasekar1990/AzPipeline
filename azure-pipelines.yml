@@ -48,86 +48,93 @@ steps:
 #       echo 'push to docker image to dockerhub repo'
 #       docker push rajasekars792/jmeter:jmeter5.3Azv1
 
-- task: Bash@3
-  displayName: 'Build and Push docker image to ACR'
-  inputs:
-    targetType: 'inline'
-    script: |
-      echo '##Build and Push docker image to ACR##'
-      ls -lrt $(System.DefaultWorkingDirectory)
-      
-      echo '##Build docker jmmaster image from docker file##'
-      docker build -f $(System.DefaultWorkingDirectory)/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 .
-      
-      echo '##push to docker jmmaster image to ACR repo##'
-      docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1
-      
-      echo '##Build docker jmslave image from docker file##' 
-      docker build -f $(System.DefaultWorkingDirectory)/jmeterslaveimage/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1 .
-      
-      echo '##push to docker jmslave image to ACR repo##'
-      docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
-
 # - task: Bash@3
-#   displayName: 'Execute Performance Test'
+#   displayName: 'Build and Push docker image to ACR'
 #   inputs:
 #     targetType: 'inline'
 #     script: |
-#       echo "##Checking for Docker container status"
-#       status_master =$(docker ps | grep "jmmasater" | wc -l)
-#       echo "$status_master"
-#       if [ $status_master == 1 ]
-#       then
-#       docker stop jmmasater
-#       docker rm -f jmmasater
-#       fi
-
-#       status_slave =$(docker ps | grep "jmslave" | wc -l)
-#       echo "$status_slave"
-#       if [ $status_slave == 1 ]
-#       then
-#       docker stop jmslave
-#       docker rm -f jmslave
-#       fi
-
-#       echo "##Creating a Container using the latest Docker Image with indefinte sleep time##"
-#       # docker run -d --name jmeter-test -p 9270:9270 rajasekars792/jmeter:jmeter5.3v1 sleep infinity
-#       docker run -d --name jmmasater -p 9270:9270 jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 sleep infinity
-#       docker run -d --name jmslave -p 9270:9270 jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1 sleep infinity
-
-#       echo "##Listing Containers##"
-#       docker ps
-
-#       echo "##Copying test scripts and csv files to JMeter bin location##"
-#       docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmmasater:/home/jmeter/
-#       docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmslave:/home/jmeter/
-
-#       echo "##Listing files in container##"
-#       docker exec -i jmeter-test /bin/bash -c 'cd /home/jmeter | ls -lrt'
-
-#       echo "##Executing Loadtest##"
-#       docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmasater /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -l /home/jmeter/jmeter$(Build.BuildId).jtl'
+#       echo '##Build and Push docker image to ACR##'
+#       ls -lrt $(System.DefaultWorkingDirectory)
       
-#       #echo "##Docker container logs##"
-#       #docker logs jmmasater
-
-#       echo "##Viewing jmeter.log##"
-#       docker exec -i jmmasater /bin/bash -c 'cat jmeter.log'
-                
-#       echo "##Creating HTML Report##"
-#       docker exec -i jmmasater /bin/bash -c 'jmeter -g /home/jmeter/jmeter$(Build.BuildId).jtl -e -o /home/jmeter/htmlreport$(Build.BuildId)/'
-
-#       echo "##Copying JTL and HTML Report to Azure Working DIR##"
-#       docker cp jmmasater:/home/jmeter/jmeter$(Build.BuildId).jtl $(System.DefaultWorkingDirectory)/test/jmeter$(Build.BuildId).jtl
-#       docker cp jmmasater:/home/jmeter/htmlreport$(Build.BuildId)/ $(System.DefaultWorkingDirectory)/test/htmlreport$(Build.BuildId)/
+#       echo '##Build docker jmmaster image from docker file##'
+#       docker build -f $(System.DefaultWorkingDirectory)/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 .
       
-#       ##> /dev/null && cat /home/jmeter/jmeter$(Build.BuildId).jtl' > $(System.DefaultWorkingDirectory)/test/jmeter$(Build.BuildId).jtl
-
-#       echo "##Kill and Remove Docker Container##"
-#       docker stop jmmasater jmslave
-#       docker rm -f jmmasater jmslave
+#       echo '##push to docker jmmaster image to ACR repo##'
+#       docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1
+      
+#       echo '##Build docker jmslave image from docker file##' 
+#       docker build -f $(System.DefaultWorkingDirectory)/jmeterslaveimage/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1 .
+      
+#       echo '##push to docker jmslave image to ACR repo##'
+#       docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1
 #     workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+- task: Bash@3
+  displayName: 'Execute Performance Test'
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo "##Checking for Docker container status"
+      status_master =$(docker ps | grep "jmmasater" | wc -l)
+      echo "$status_master"
+      if [ $status_master == 1 ]
+      then
+      docker stop jmmasater
+      docker rm -f jmmasater
+      fi
+
+      status_slave =$(docker ps | grep "jmslave" | wc -l)
+      echo "$status_slave"
+      if [ $status_slave == 1 ]
+      then
+      docker stop jmslave
+      docker rm -f jmslave
+      fi
+
+      echo "##Creating a Container using the latest Docker Image with indefinte sleep time##"
+      # docker run -d --name jmeter-test -p 9270:9270 rajasekars792/jmeter:jmeter5.3v1 sleep infinity
+      docker run -d --name jmmasater -p 9270:9270 jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 sleep infinity
+      docker run -d --name jmslave -p 9270:9270 jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1 sleep infinity
+
+      echo "##Extracting jmmaster jmslave container IP address##"
+      master_pod = docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmmaster
+      echo "$master_pod"
+
+      slave_pods_1 = docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmslave
+      echo "$slave_pods_1"
+
+      # echo "##Listing Containers##"
+      # docker ps
+
+      # echo "##Copying test scripts and csv files to JMeter bin location##"
+      # docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmmasater:/home/jmeter/
+      # docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmslave:/home/jmeter/
+
+      # echo "##Listing files in container##"
+      # docker exec -i jmeter-test /bin/bash -c 'cd /home/jmeter | ls -lrt'
+
+      # echo "##Executing Loadtest##"
+      # docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmasater /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -l /home/jmeter/jmeter$(Build.BuildId).jtl'
+      
+      # #echo "##Docker container logs##"
+      # #docker logs jmmasater
+
+      # echo "##Viewing jmeter.log##"
+      # docker exec -i jmmasater /bin/bash -c 'cat jmeter.log'
+                
+      # echo "##Creating HTML Report##"
+      # docker exec -i jmmasater /bin/bash -c 'jmeter -g /home/jmeter/jmeter$(Build.BuildId).jtl -e -o /home/jmeter/htmlreport$(Build.BuildId)/'
+
+      # echo "##Copying JTL and HTML Report to Azure Working DIR##"
+      # docker cp jmmasater:/home/jmeter/jmeter$(Build.BuildId).jtl $(System.DefaultWorkingDirectory)/test/jmeter$(Build.BuildId).jtl
+      # docker cp jmmasater:/home/jmeter/htmlreport$(Build.BuildId)/ $(System.DefaultWorkingDirectory)/test/htmlreport$(Build.BuildId)/
+      
+      # ##> /dev/null && cat /home/jmeter/jmeter$(Build.BuildId).jtl' > $(System.DefaultWorkingDirectory)/test/jmeter$(Build.BuildId).jtl
+
+      # echo "##Kill and Remove Docker Container##"
+      # docker stop jmmasater jmslave
+      # docker rm -f jmmasater jmslave
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
 
 # - task: PublishReleaseArtifact@1
 #   displayName: 'Collate Results'
