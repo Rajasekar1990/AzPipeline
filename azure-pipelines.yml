@@ -100,11 +100,11 @@ steps:
       docker ps -a
 
       echo "##Extracting jmmaster jmslave container IP address##"
-      master_pod_ip=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmmaster)
-      echo "masterpod ip: $master_pod_ip"
+      master_ip=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmmaster)
+      echo "master ip: $master_ip"
 
-      slave_pod1_ip=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmslave)
-      echo "slavepod1 ip: $slave_pod1_ip"
+      slave1_ip=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jmslave)
+      echo "slave1 ip: $slave1_ip"
 
       echo "##Copying test scripts and csv files to JMeter bin location##"
       docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmmaster:/home/jmeter/
@@ -114,7 +114,7 @@ steps:
       # docker exec -i jmeter-test /bin/bash -c 'cd /home/jmeter | ls -lrt'
 
       echo "##Executing Loadtest##"
-      docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${master_pod_ip},${slave_pod1_ip} -l /home/jmeter/jmeter$(Build.BuildId).jtl'
+      docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter$(Build.BuildId).jtl'
       
       # #echo "##Docker container logs##"
       # #docker logs jmmaster
