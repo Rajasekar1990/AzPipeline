@@ -107,24 +107,24 @@ steps:
       echo "slave1 ip: $slave1_ip"
 
       echo "##Copying test scripts and csv files to JMeter bin location##"
-      docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmmaster:/home/jmeter/
-      docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmslave:/home/jmeter/
+      docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmmaster:${JMETER_BIN}/
+      docker cp $(System.DefaultWorkingDirectory)/test/Pipeline_SampleScript.jmx jmslave:${JMETER_BIN}/
 
       echo "##Listing files in master container##"
-      docker exec -i jmmaster /bin/bash -c 'cd ${JMETER_BIN} && ls -lart'
+      docker exec -i jmmaster /bin/bash -c 'cd ${JMETER_BIN}/ && ls -lart'
 
       echo "##Listing files in slave container##"
-      docker exec -i jmslave /bin/bash -c 'cd ${JMETER_BIN} && ls -lart'
+      docker exec -i jmslave /bin/bash -c 'cd ${JMETER_BIN}/ && ls -lart'
 
       echo "##Executing Loadtest##"
       #docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter$(Build.BuildId).jtl'
-      #docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l jmeter$(Build.BuildId).jtl'
+      docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l jmeter$(Build.BuildId).jtl'
       
       # #echo "##Docker container logs##"
       # #docker logs jmmaster
 
-      # echo "##Viewing jmeter.log##"
-      # docker exec -i jmmaster /bin/bash -c 'cat jmeter.log'
+      echo "##Viewing jmeter.log##"
+      docker exec -i jmmaster /bin/bash -c 'cat jmeter.log'
                 
       # echo "##Creating HTML Report##"
       # docker exec -i jmmaster /bin/bash -c 'jmeter -g /home/jmeter/jmeter1.jtl -e -o /home/jmeter/htmlreport1/'
