@@ -61,12 +61,13 @@ steps:
       
       echo '##push to docker jmmaster image to ACR repo##'
       docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1
-
+      
       echo '##Build docker jmslave image from docker file##' 
       docker build -f $(System.DefaultWorkingDirectory)/jmeterslaveimage/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1 .
-
+      
       echo '##push to docker jmslave image to ACR repo##'
       docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
 
 # - task: Bash@3
 #   displayName: 'Execute Performance Test'
