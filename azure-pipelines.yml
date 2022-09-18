@@ -142,7 +142,7 @@ steps:
       docker rm -f jmmaster jmslave
     workingDirectory: '$(System.DefaultWorkingDirectory)'
 
-# - task: PublishReleaseArtifact@1
-#   displayName: 'Collate Results'
-#   inputs:
-#     artifactPath: '$(System.DefaultWorkingDirectory)'
+- task: PublishReleaseArtifact@1
+  displayName: 'Collate Results'
+  inputs:
+    artifactPath: '$(System.DefaultWorkingDirectory)'
