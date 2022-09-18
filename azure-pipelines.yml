@@ -23,7 +23,7 @@ steps:
 #     targetType: 'inline'
 #     script: |
 #       echo '##Login to Docker Hub'
-#       docker login -u rajasekars792 -p Shiva2889$
+#       docker login -u rajasekars792 -p *
 #       docker --version
 #     workingDirectory: '$(System.DefaultWorkingDirectory)'
 
@@ -48,26 +48,26 @@ steps:
 #       echo 'push to docker image to dockerhub repo'
 #       docker push rajasekars792/jmeter:jmeter5.3Azv1
 
-# - task: Bash@3
-#   displayName: 'Build and Push docker image to ACR'
-#   inputs:
-#     targetType: 'inline'
-#     script: |
-#       echo '##Build and Push docker image to ACR##'
-#       ls -lrt $(System.DefaultWorkingDirectory)
+- task: Bash@3
+  displayName: 'Build and Push docker image to ACR'
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo '##Build and Push docker image to ACR##'
+      ls -lrt $(System.DefaultWorkingDirectory)
       
-#       echo '##Build docker jmmaster image from docker file##'
-#       docker build -f $(System.DefaultWorkingDirectory)/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 .
+      echo '##Build docker jmmaster image from docker file##'
+      docker build -f $(System.DefaultWorkingDirectory)/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 .
       
-#       echo '##push to docker jmmaster image to ACR repo##'
-#       docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1
+      echo '##push to docker jmmaster image to ACR repo##'
+      docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1
       
-#       echo '##Build docker jmslave image from docker file##' 
-#       docker build -f $(System.DefaultWorkingDirectory)/jmeterslaveimage/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1 .
+      echo '##Build docker jmslave image from docker file##' 
+      docker build -f $(System.DefaultWorkingDirectory)/jmeterslaveimage/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1 .
       
-#       echo '##push to docker jmslave image to ACR repo##'
-#       docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1
-#     workingDirectory: '$(System.DefaultWorkingDirectory)'
+      echo '##push to docker jmslave image to ACR repo##'
+      docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azslavev1
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
 
 - task: Bash@3
   displayName: 'Execute Performance Test'
@@ -118,8 +118,6 @@ steps:
 
       echo "##Executing Loadtest##"
       #docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter$(Build.BuildId).jtl'
-      #docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R$slave1_ip -l /home/jmeter/jmeter$(Build.BuildId).jtl'
-      #docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c 'jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R172.17.0.3 -l /home/jmeter/jmeter$(Build.BuildId).jtl'
       docker exec -i -e JVM_ARGS="-Xms2048m -Xmx4096m" jmmaster /bin/bash -c "jmeter -n -t /home/jmeter/Pipeline_SampleScript.jmx -Dserver.rmi.ssl.disable=true -R${slave1_ip} -l /home/jmeter/jmeter$(Build.BuildId).jtl"
       
       # #echo "##Docker container logs##"
