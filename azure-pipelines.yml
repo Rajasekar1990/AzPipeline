@@ -57,7 +57,7 @@ steps:
       ls -lrt $(System.DefaultWorkingDirectory)
       
       echo '##Build docker jmmaster image from docker file##'
-      docker build -f $(System.DefaultWorkingDirectory)/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 .
+      docker build -f $(System.DefaultWorkingDirectory)/jmetermasterimage/Dockerfile -t jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1 .
       
       echo '##push to docker jmmaster image to ACR repo##'
       docker push jmeteracrrepo.azurecr.io/jmeter:jmeter5.3Azmasterv1
