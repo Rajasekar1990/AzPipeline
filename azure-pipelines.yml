@@ -75,7 +75,7 @@ steps:
     targetType: 'inline'
     script: |
       echo "##Checking for Docker container status"
-      status_master =$(docker ps | grep "jmmaster" | wc -l)
+      status_master=$(docker ps | grep "jmmaster" | wc -l)
       echo "$status_master"
       if [ $status_master == 1 ]
       then
@@ -83,7 +83,7 @@ steps:
       docker rm -f jmmaster
       fi
 
-      status_slave =$(docker ps | grep "jmslave" | wc -l)
+      status_slave=$(docker ps | grep "jmslave" | wc -l)
       echo "$status_slave"
       if [ $status_slave == 1 ]
       then
